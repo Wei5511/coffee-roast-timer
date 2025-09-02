@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <style>
+    #historyTable th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #historyTable td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    </style>
+    <style>
+    #historyTable th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    </style>
+    <style>
+    #historyTable th, #historyTable td {
+        height: 36px !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        vertical-align: middle !important;
+    }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=600, initial-scale=1">
+    <title>烘豆記錄表單</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #f6f9fc;
+            font-family: 'Noto Sans TC', '微軟正黑體', sans-serif;
+        }
+        .container {
+            width: 430px;
+            max-width: 100vw;
+            margin: 32px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px #0001;
+            padding: 24px 18px 18px 18px;
+        }
+        .form-title {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #2a3a4a;
+            margin-bottom: 18px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #1976d2;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #bcd0e0;
+            margin-bottom: 12px;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #eee;
+            margin-bottom: 18px;
+        }
+        .card-header {
+            background: #1976d2;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .card-body {
+            background: #f7faff;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            text-align: center;
+        }
+        .btn-start {
+            background: #64b5f6;
+            color: #fff;
+            width: 90%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-stop {
+            background: #ef9a9a;
+            color: #fff;
+            width: 90%;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-btn {
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 提醒視窗 -->
+    <div id="reminderModal" class="modal" tabindex="-1" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:#fff;padding:24px 18px;border-radius:16px;max-width:320px;margin:auto;box-shadow:0 2px 16px #0002;text-align:center;">
+            <div id="reminderTitle" style="font-size:1.2em;color:#1976d2;font-weight:bold;margin-bottom:10px;">請輸入 00:00 溫度</div>
+            <input id="reminderInput" type="number" class="form-control" style="font-size:1.2em;text-align:center;margin-bottom:10px;" placeholder="溫度">
+            <button id="reminderConfirm" class="btn btn-primary" style="width:100%;font-size:1.1em;">確認</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-title-bar" style="background:linear-gradient(90deg,#1976d2,#2196f3);border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:flex-start;position:relative;padding:0;min-height:60px;margin-bottom:24px;">
+            <button id="backBtn" class="btn btn-link" style="background:rgba(0,0,0,0.08);border-radius:10px;padding:0 12.8px 0 8px;height:32px;display:flex;align-items:center;position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#fff;font-size:0.90em;text-decoration:none;">
+                <span style="display:flex;align-items:center;justify-content:center;width:16px;height:16px;margin-right:4.8px;">
+                    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M10.5 3.5a.75.75 0 0 1 0 1.06L6.06 9l4.44 4.44a.75.75 0 1 1-1.06 1.06l-5-5a.75.75 0 0 1 0-1.06l5-5a.75.75 0 0 1 1.06 0z"></path></svg>
+                </span>
+                <span style="display:flex;align-items:center;font-size:1.05em;">返回</span>
+            </button>
+            <span style="flex:1;text-align:center;display:flex;align-items:center;justify-content:center;font-size:1.40em;font-weight:700;letter-spacing:1px;color:#fff;">烘豆記錄表單</span>
+        </div>
+        <!-- ...表單欄位... -->
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">日期</label>
+                <input type="date" class="form-control" id="date">
+            </div>
+            <div class="col-6">
+                <label class="form-label">入豆重(g)</label>
+                <input type="number" class="form-control" id="inputWeight">
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">熱機溫度(°C)</label>
+                <input type="number" class="form-control" id="preheatTemp">
+            </div>
+            <div class="col-6">
+                <label class="form-label">豆種</label>
+                <input list="beanTypeList" class="form-control" id="beanType" placeholder="請選擇或輸入豆種">
+                <datalist id="beanTypeList">
+                    <option value="肯亞">
+                    <option value="蘇門答臘">
+                    <option value="曼特寧">
+                    <option value="耶加雪菲">
+                    <option value="衣索比亞">
+                    <option value="哥倫比亞">
+                    <option value="祕魯">
+                    <option value="巴西">
+                    <option value="夏威夷">
+                </datalist>
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header"><i class="fa fa-robot me-2"></i>烘豆計時器</div>
+            <div class="card-body">
+                <div style="display:flex; justify-content:center; align-items:center; width:100%;">
+                    <button id="startBtn" type="button" class="btn btn-start mb-2" style="margin:auto;"><i class="fa fa-play me-2"></i>開始烘豆</button>
+                </div>
+                <div style="display:flex; justify-content:center; align-items:center; width:100%; margin-bottom:12px;">
+                    <button id="stopBtn" type="button" class="btn btn-stop" style="display:none; margin:auto; min-width:200px; font-size:1.1em;"><i class="fa fa-stop me-2"></i>結束烘豆</button>
+                </div>
+                <div id="timerBox" style="background:#e3f7ff;padding:20px;border-radius:10px;display:none;text-align:center; margin-top:10px;">
+                    <div id="timerDisplay" style="font-size:2em;color:#1976d2;font-weight:bold;">00:00</div>
+                    <div id="crackBtns" style="display:flex; justify-content:center; gap:0; margin-top:18px;">
+                        <button id="firstCrackBtn" type="button" style="background:#ffe066; color:#333; border:none; border-radius:8px 0 0 8px; font-size:1.1em; font-weight:bold; padding:10px 28px; display:flex; align-items:center;">
+                            <i class="fa fa-fire" style="margin-right:8px;"></i>一爆
+                        </button>
+                        <button id="secondCrackBtn" type="button" style="background:#ef5350; color:#fff; border:none; border-radius:0 8px 8px 0; font-size:1.1em; font-weight:bold; padding:10px 28px; display:flex; align-items:center;">
+                            <i class="fa fa-tint" style="margin-right:8px;"></i>二爆
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ...其他欄位與表格... -->
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">出豆溫度(°C)</label>
+                <input type="number" class="form-control" id="outputTemp">
+            </div>
+            <div class="col-6">
+                <label class="form-label">出豆重(g)</label>
+                <input type="number" class="form-control" id="outputWeight">
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">失重率(%)</label>
+                <input type="number" class="form-control" id="lossRate" readonly>
+            </div>
+            <div class="col-6">
+                <label class="form-label">烘培度</label>
+                <input type="text" class="form-control" id="roastLevel" readonly>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">一爆時間</label>
+                <input type="text" class="form-control" id="firstCrackTime">
+            </div>
+            <div class="col-6">
+                <label class="form-label">一爆溫度(°C)</label>
+                <input type="number" class="form-control" id="firstCrackTemp">
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-6">
+                <label class="form-label">二爆時間</label>
+                <input type="text" class="form-control" id="secondCrackTime">
+            </div>
+            <div class="col-6">
+                <label class="form-label">二爆溫度(°C)</label>
+                <input type="number" class="form-control" id="secondCrackTemp">
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-12">
+                <label class="form-label">總時間</label>
+                <input type="text" class="form-control" id="totalTime">
+            </div>
+        </div>
+        <div class="table-title" style="color:#1976d2; font-weight:normal; font-size:1rem; margin-top:30px;">每30秒溫度與火力</div>
+        <div style="overflow-x:auto; width:100%;">
+        <table class="table table-bordered" style="font-size:12px; font-family:'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif; table-layout:fixed; width:100%;">
+            <thead>
+                <tr>
+                    <th style="width:10%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">時間</th>
+                    <th style="width:20%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">溫度(°C)</th>
+                    <th style="width:20%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">火力</th>
+                    <th style="width:10%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">時間</th>
+                    <th style="width:20%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">溫度(°C)</th>
+                    <th style="width:20%; font-size:12px; font-weight:normal; line-height:1; vertical-align:middle; text-align:center; white-space:nowrap;">火力</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align:center; height:48px; vertical-align:middle; font-weight:normal;">0:00</td>
+                    <td style="text-align:center; height:48px; vertical-align:middle;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:32px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:48px; vertical-align:middle;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:32px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:48px; vertical-align:middle; font-weight:normal;">0:30</td>
+                    <td style="text-align:center; height:48px; vertical-align:middle;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:32px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:48px; vertical-align:middle;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:32px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">1:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">1:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">2:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">2:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">3:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">3:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">4:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">4:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">5:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">5:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">6:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">6:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">7:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">7:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; height:36px; font-weight:normal;">8:00</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px; font-weight:normal;">8:30</td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                    <td style="text-align:center; height:36px;"><input type="number" class="form-control" style="display:inline-block; text-align:center; height:26px; width:60px; font-size:13px; border-radius:13px; margin:auto; vertical-align:middle;"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <!-- 儲存/下載CSV與歷史紀錄區塊（嵌在主容器430px寬度內，置中，且在所有表格之後） -->
+    <div id="historyArea" style="margin-top:32px; width:430px; max-width:100vw; margin-left:auto; margin-right:auto; text-align:center;">
+        <div style="display:flex; justify-content:center; gap:12px; margin-bottom:18px;">
+            <button id="saveBtn" class="btn btn-primary" style="min-width:80px;">儲存</button>
+            <button id="downloadBtn" class="btn btn-info" style="min-width:110px;color:#fff;">下載 CSV</button>
+        </div>
+        <div style="font-size:1.2em; color:#1976d2; font-weight:normal; margin-bottom:8px; text-align:left;">歷史紀錄</div>
+        <div style="width:100%; overflow-x:auto;">
+            <table id="historyTable" class="table table-bordered" style="min-width:900px; font-size:13px; background:#f7faff; margin-bottom:0;">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>豆種</th>
+                        <th>入豆重</th>
+                        <th>出豆重</th>
+                        <th>失重率(%)</th>
+                        <th>烘焙度</th>
+                        <th>總時間</th>
+                        <th>熱機溫度</th>
+                        <th>出豆溫度</th>
+                        <th>一爆時間</th>
+                        <th>一爆溫度</th>
+                        <th>二爆時間</th>
+                        <th>二爆溫度</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 歷史資料將由JS自動填入 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+    document.getElementById('backBtn').onclick = function() {
+        window.location.href = 'splash.html';
+    };
+    window.addEventListener('DOMContentLoaded', function() {
+        // 計時器與提醒視窗功能
+        let timer = null;
+        let seconds = 0;
+        let reminderInterval = null;
+        let reminderTimes = [];
+        let reminderIndex = 0;
+        // 提醒視窗區
+        const reminderModal = document.getElementById('reminderModal');
+        const reminderTitle = document.getElementById('reminderTitle');
+        const reminderInput = document.getElementById('reminderInput');
+        const reminderConfirm = document.getElementById('reminderConfirm');
+        let reminderStep = 0;
+        let tempValue = '';
+        let powerValue = '';
+        // 按鈕區
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const timerBox = document.getElementById('timerBox');
+        const timerDisplay = document.getElementById('timerDisplay');
+            // 一爆/二爆按鈕功能
+            const firstCrackBtn = document.getElementById('firstCrackBtn');
+            const secondCrackBtn = document.getElementById('secondCrackBtn');
+            const firstCrackTimeInput = document.getElementById('firstCrackTime');
+            const secondCrackTimeInput = document.getElementById('secondCrackTime');
+            if (firstCrackBtn && firstCrackTimeInput) {
+                firstCrackBtn.onclick = function() {
+                    if (timerDisplay) {
+                        firstCrackTimeInput.value = timerDisplay.textContent;
+                    }
+                };
+            }
+            if (secondCrackBtn && secondCrackTimeInput) {
+                secondCrackBtn.onclick = function() {
+                    if (timerDisplay) {
+                        secondCrackTimeInput.value = timerDisplay.textContent;
+                    }
+                };
+            }
+
+        // 失重率與烘焙度自動計算
+        const inputWeight = document.getElementById('inputWeight');
+        const outputWeight = document.getElementById('outputWeight');
+        const lossRate = document.getElementById('lossRate');
+        const roastLevel = document.getElementById('roastLevel');
+        function calcLossRateAndLevel() {
+            const inVal = parseFloat(inputWeight.value);
+            const outVal = parseFloat(outputWeight.value);
+            if (!isNaN(inVal) && !isNaN(outVal) && inVal > 0 && outVal >= 0) {
+                const rate = ((inVal - outVal) / inVal) * 100;
+                const rateFixed = Math.round(rate * 100) / 100;
+                lossRate.value = rateFixed;
+                let level = '';
+                if (rateFixed >= 8 && rateFixed < 12) {
+                    level = '極淺焙';
+                } else if (rateFixed >= 12 && rateFixed < 14) {
+                    level = '淺烘焙';
+                } else if (rateFixed >= 14 && rateFixed < 15) {
+                    level = '淺中焙';
+                } else if (rateFixed >= 15 && rateFixed < 16) {
+                    level = '中烘焙';
+                } else if (rateFixed >= 16 && rateFixed < 18) {
+                    level = '中深焙';
+                } else if (rateFixed >= 18 && rateFixed < 20) {
+                    level = '深烘焙';
+                } else if (rateFixed >= 20) {
+                    level = '極深焙';
+                }
+                roastLevel.value = level;
+            } else {
+                lossRate.value = '';
+                roastLevel.value = '';
+            }
+        }
+        inputWeight.addEventListener('input', calcLossRateAndLevel);
+        outputWeight.addEventListener('input', calcLossRateAndLevel);
+
+        // 計時器顯示格式
+        function formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            return m + ':' + s;
+        }
+        // 提醒視窗顯示
+        function showReminder(step, sec) {
+            reminderModal.style.display = 'flex';
+            let timeStr = '00:00';
+            if (typeof sec === 'number') {
+                timeStr = formatTime(sec);
+            } else if (reminderIndex < reminderTimes.length) {
+                timeStr = formatTime(reminderTimes[reminderIndex]);
+            }
+            if (step === 0) {
+                reminderStep = 0;
+                reminderTitle.textContent = `請輸入 ${timeStr} 溫度`;
+                reminderInput.value = '';
+                reminderInput.placeholder = '溫度';
+                reminderInput.type = 'number';
+            } else if (step === 1) {
+                reminderStep = 1;
+                reminderTitle.textContent = `請輸入 ${timeStr} 火力`;
+                reminderInput.value = '';
+                reminderInput.placeholder = '火力';
+                reminderInput.type = 'number';
+            }
+            reminderInput.focus();
+        }
+        // 隱藏提醒視窗
+        function hideReminder() {
+            reminderModal.style.display = 'none';
+        }
+        // 提醒視窗確認流程
+        reminderConfirm.onclick = function() {
+            if (reminderStep === 0) {
+                tempValue = reminderInput.value;
+                if (tempValue === '' || isNaN(tempValue)) {
+                    reminderInput.focus();
+                    return;
+                }
+                reminderStep = 1;
+                showReminder(1, reminderTimes[reminderIndex]);
+            } else if (reminderStep === 1) {
+                powerValue = reminderInput.value;
+                if (powerValue === '' || isNaN(powerValue)) {
+                    reminderInput.focus();
+                    return;
+                }
+                // 自動填入表格對應時間欄位
+                const table = document.querySelector('table');
+                if (table) {
+                    const rows = table.querySelectorAll('tbody tr');
+                    // 00:00 填入第1列左側
+                    if (reminderIndex === 0 && rows.length > 0) {
+                        const row = rows[0];
+                        const tempInput = row.querySelector('td:nth-child(2) input');
+                        const powerInput = row.querySelector('td:nth-child(3) input');
+                        if (tempInput) tempInput.value = tempValue;
+                        if (powerInput) powerInput.value = powerValue;
+                    } else if (reminderIndex > 0) {
+                        // 0:30、1:00、1:30...依序填入
+                        const targetRow = Math.floor((reminderIndex) / 2);
+                        if (targetRow < rows.length) {
+                            const row = rows[targetRow];
+                            if (reminderIndex % 2 === 1) {
+                                // 奇數：右側（第4、5欄）
+                                const tempInput = row.querySelector('td:nth-child(5) input');
+                                const powerInput = row.querySelector('td:nth-child(6) input');
+                                if (tempInput) tempInput.value = tempValue;
+                                if (powerInput) powerInput.value = powerValue;
+                            } else {
+                                // 偶數：左側（第2、3欄）
+                                const tempInput = row.querySelector('td:nth-child(2) input');
+                                const powerInput = row.querySelector('td:nth-child(3) input');
+                                if (tempInput) tempInput.value = tempValue;
+                                if (powerInput) powerInput.value = powerValue;
+                            }
+                        }
+                    }
+                }
+                hideReminder();
+                reminderStep = 0;
+            }
+        }
+        // 開始烘豆
+        startBtn.onclick = function() {
+            seconds = 0;
+            timerDisplay.textContent = formatTime(seconds);
+            startBtn.style.display = 'none';
+            stopBtn.style.display = '';
+            timerBox.style.display = '';
+            timer = setInterval(() => {
+                seconds++;
+                timerDisplay.textContent = formatTime(seconds);
+            }, 1000);
+            // 設定提醒時間序列
+            reminderTimes = [];
+            for (let i = 0; i < 20; i++) reminderTimes.push(i * 30); // 最多10分鐘
+            reminderIndex = 0;
+            // 立即跳出 00:00 提醒
+            showReminder(0);
+            // 每30秒自動提醒
+            reminderInterval = setInterval(() => {
+                reminderIndex++;
+                if (reminderIndex < reminderTimes.length) {
+                    showReminder(0, reminderTimes[reminderIndex]);
+                }
+            }, 30000);
+        }
+        // 結束烘豆
+        stopBtn.onclick = function() {
+            clearInterval(timer);
+            clearInterval(reminderInterval);
+            startBtn.style.display = '';
+            stopBtn.style.display = 'none';
+            timerBox.style.display = 'none';
+            hideReminder();
+            // 結束時紀錄總時間
+            const totalTimeInput = document.getElementById('totalTime');
+            if (totalTimeInput && timerDisplay) {
+                totalTimeInput.value = timerDisplay.textContent;
+            }
+        }
+        // 儲存/下載CSV/歷史紀錄功能
+        function getFormData() {
+            // 收集每30秒溫度與火力
+            var tempPowerArr = [];
+            var tableRows = document.querySelectorAll('.table.table-bordered tbody tr');
+            tableRows.forEach(function(row) {
+                var tds = row.querySelectorAll('td');
+                if (tds.length >= 6) {
+                    tempPowerArr.push({
+                        time1: tds[0].textContent,
+                        temp1: tds[1].querySelector('input') ? tds[1].querySelector('input').value : '',
+                        power1: tds[2].querySelector('input') ? tds[2].querySelector('input').value : '',
+                        time2: tds[3].textContent,
+                        temp2: tds[4].querySelector('input') ? tds[4].querySelector('input').value : '',
+                        power2: tds[5].querySelector('input') ? tds[5].querySelector('input').value : ''
+                    });
+                }
+            });
+            return {
+                date: document.getElementById('date').value,
+                beanType: document.getElementById('beanType').value,
+                inputWeight: document.getElementById('inputWeight').value,
+                outputWeight: document.getElementById('outputWeight').value,
+                lossRate: document.getElementById('lossRate').value,
+                roastLevel: document.getElementById('roastLevel').value,
+                totalTime: document.getElementById('totalTime').value,
+                preheatTemp: document.getElementById('preheatTemp').value,
+                outputTemp: document.getElementById('outputTemp').value,
+                firstCrackTime: document.getElementById('firstCrackTime').value,
+                firstCrackTemp: document.getElementById('firstCrackTemp').value,
+                secondCrackTime: document.getElementById('secondCrackTime').value,
+                secondCrackTemp: document.getElementById('secondCrackTemp').value,
+                tempPowerArr: tempPowerArr
+            };
+        }
+        function saveHistory() {
+            const data = getFormData();
+            let history = JSON.parse(localStorage.getItem('roastHistory') || '[]');
+            history.unshift(data);
+            localStorage.setItem('roastHistory', JSON.stringify(history));
+            renderHistory();
+            // 清空所有表單欄位
+            const inputs = document.querySelectorAll('.container input, .container select, .container textarea');
+            inputs.forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = false;
+                } else {
+                    el.value = '';
+                }
+            });
+        }
+        function renderHistory() {
+            let history = JSON.parse(localStorage.getItem('roastHistory') || '[]');
+            const table = document.getElementById('historyTable');
+            const thead = table.querySelector('thead tr');
+            const tbody = table.querySelector('tbody');
+            // 動態產生 thead
+            let baseHeader = ['日期','豆種','入豆重','出豆重','失重率(%)','烘焙度','總時間','熱機溫度','出豆溫度','一爆時間','一爆溫度','二爆時間','二爆溫度'];
+            let tempHeaders = [];
+            if (history.length && history[0].tempPowerArr) {
+                history[0].tempPowerArr.forEach((row, idx) => {
+                    tempHeaders.push(`<th>${row.time1}溫度</th><th>${row.time1}火力</th><th>${row.time2}溫度</th><th>${row.time2}火力</th>`);
+                });
+            }
+            thead.innerHTML = baseHeader.map(h=>`<th>${h}</th>`).join('') + tempHeaders.join('');
+            tbody.innerHTML = '';
+            history.forEach(item => {
+                const tr = document.createElement('tr');
+                let tempPowerHtml = '';
+                if (item.tempPowerArr && item.tempPowerArr.length) {
+                    tempPowerHtml = item.tempPowerArr.map(row => {
+                        return `<td style='height:36px;'>${row.temp1}</td><td style='height:36px;'>${row.power1}</td><td style='height:36px;'>${row.temp2}</td><td style='height:36px;'>${row.power2}</td>`;
+                    }).join('');
+                }
+                tr.innerHTML = `
+                    <td>${item.date || ''}</td>
+                    <td>${item.beanType || ''}</td>
+                    <td>${item.inputWeight || ''}</td>
+                    <td>${item.outputWeight || ''}</td>
+                    <td>${item.lossRate || ''}</td>
+                    <td>${item.roastLevel || ''}</td>
+                    <td>${item.totalTime || ''}</td>
+                    <td>${item.preheatTemp || ''}</td>
+                    <td>${item.outputTemp || ''}</td>
+                    <td>${item.firstCrackTime || ''}</td>
+                    <td>${item.firstCrackTemp || ''}</td>
+                    <td>${item.secondCrackTime || ''}</td>
+                    <td>${item.secondCrackTemp || ''}</td>
+                    ${tempPowerHtml}
+                `;
+                tr.style.height = '36px';
+                tbody.appendChild(tr);
+            });
+        }
+        function downloadCSV() {
+            let history = JSON.parse(localStorage.getItem('roastHistory') || '[]');
+            if (!history.length) return;
+            let header = ['日期','豆種','入豆重','出豆重','失重率(%)','烘焙度','總時間','熱機溫度','出豆溫度','一爆時間','一爆溫度','二爆時間','二爆溫度'];
+            // 加入每30秒溫度與火力欄位
+            if (history.length && history[0].tempPowerArr) {
+                history[0].tempPowerArr.forEach((row, idx) => {
+                    header.push(`${row.time1}溫度`, `${row.time1}火力`, `${row.time2}溫度`, `${row.time2}火力`);
+                });
+            }
+            const rows = history.map(item => {
+                let arr = [
+                    item.date, item.beanType, item.inputWeight, item.outputWeight, item.lossRate, item.roastLevel, item.totalTime, item.preheatTemp, item.outputTemp, item.firstCrackTime, item.firstCrackTemp, item.secondCrackTime, item.secondCrackTemp
+                ];
+                if (item.tempPowerArr && item.tempPowerArr.length) {
+                    item.tempPowerArr.forEach(row => {
+                        arr.push(row.time1, row.temp1, row.power1, row.time2, row.temp2, row.power2);
+                    });
+                }
+                return arr;
+            });
+            let csv = header.join(',') + '\n' + rows.map(r => r.join(',')).join('\n');
+            // 加入UTF-8 BOM，避免Excel亂碼
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], {type:'text/csv;charset=utf-8;'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'roast_history.csv';
+            a.click();
+        }
+        document.getElementById('saveBtn').onclick = saveHistory;
+        document.getElementById('downloadBtn').onclick = downloadCSV;
+        renderHistory();
+    });
+    </script>
+</body>
+</html>

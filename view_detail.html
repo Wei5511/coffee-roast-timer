@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=600, initial-scale=1">
+    <title>詳細記錄查看</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #f6f9fc; font-family: 'Noto Sans TC', '微軟正黑體', sans-serif; }
+        .container { max-width: 480px; margin: 32px auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px #0001; padding: 24px 18px 18px 18px; }
+        .section-title { background: linear-gradient(90deg,#1976d2,#2196f3); color: #fff; border-radius: 16px 16px 0 0; padding: 18px 0 12px 0; text-align: center; font-size: 1.35em; font-weight: 700; letter-spacing: 1px; margin-bottom: 24px; }
+        .summary-card { background: #f8fbff; border-radius: 16px; box-shadow: 0 2px 12px #1976d233; padding: 18px 0 12px 0; margin-bottom: 18px; }
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (min-width: 480px) {
+            .summary-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 600px) {
+            .summary-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        }
+        .summary-item {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #eee;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            text-align: center;
+        }
+        .summary-label {
+            font-size: 1.03em;
+            color: #888;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+    .summary-value {
+    font-size: 1em;
+        color: #1976d2;
+        font-weight: 700;
+        margin-bottom: 0.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 1.8em;
+    }
+    #sumDate {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.12em;
+        color: #1976d2;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 0.2em;
+    }
+    }
+        .chart-section { background: #f8fbff; border-radius: 16px; box-shadow: 0 2px 12px #1976d233; padding: 18px 0 12px 0; margin-bottom: 18px; }
+        .table-section { background: #f8fbff; border-radius: 16px; box-shadow: 0 2px 12px #1976d233; padding: 18px 0 12px 0; }
+        .table-title { background: #1976d2; color: #fff; border-radius: 12px 12px 0 0; padding: 10px 0 10px 0; font-weight:600; font-size:1.15em; text-align:left; }
+        table { width: 100%; border-radius: 0 0 12px 12px; overflow: hidden; }
+        th, td { text-align: center; vertical-align: middle; font-size: 14px; white-space: nowrap; height: 36px; padding-top: 0; padding-bottom: 0; }
+        #sumDate {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.12em;
+            color: #1976d2;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 0.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:center;margin-bottom:24px;position:relative;height:56px;border-radius:16px 16px 0 0;">
+            <button id="backToHistoryBtn" class="btn" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);height:27.2px;min-width:47.6px;font-size:0.85em;padding:0 10px;border-radius:8px;background:#1976d2;border:none;box-shadow:none;display:flex;align-items:center;gap:3.4px;color:#fff;z-index:10;">
+                <span style="font-size:1.02em;line-height:1;">←</span>
+                <span style="font-size:0.85em;">返回</span>
+            </button>
+            <span style="width:100%;height:56px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.16em;font-weight:700;letter-spacing:1px;position:relative;top:-6px;">詳細記錄查看</span>
+        </div>
+        <!-- 記錄摘要 -->
+        <div class="summary-card">
+            <div class="summary-label" style="text-align:left;font-weight:600;margin-bottom:8px;"><i class="fa fa-info-circle me-1"></i> 記錄摘要</div>
+            <div class="summary-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="summary-item"><div class="summary-label">日期</div><div class="summary-value" id="sumDate">2025<br>09-02</div></div>
+                <div class="summary-item"><div class="summary-label">豆種</div><div class="summary-value" id="sumType" style="color:#1976d2;font-weight:700;">肯亞</div></div>
+                <div class="summary-item"><div class="summary-label">入豆重</div><div class="summary-value" id="sumInput">150g</div></div>
+                <div class="summary-item"><div class="summary-label">出豆重</div><div class="summary-value" id="sumOutput">130g</div></div>
+                <div class="summary-item"><div class="summary-label">失水率</div><div class="summary-value" id="sumLoss">13.33%</div></div>
+                <div class="summary-item"><div class="summary-label">烘焙度</div><div class="summary-value" id="sumRoast" style="color:#1976d2;font-weight:700;">淺焙</div></div>
+                <div class="summary-item"><div class="summary-label">一爆時間</div><div class="summary-value" id="sumFirstCrackTime" style="color:#1976d2;font-weight:700;">03:00</div></div>
+                <div class="summary-item"><div class="summary-label">一爆溫度</div><div class="summary-value" id="sumFirstCrackTemp" style="color:#1976d2;font-weight:700;">210</div></div>
+                <div class="summary-item"><div class="summary-label">二爆時間</div><div class="summary-value" id="sumSecondCrackTime" style="color:#1976d2;font-weight:700;">--</div></div>
+                <div class="summary-item"><div class="summary-label">二爆溫度</div><div class="summary-value" id="sumSecondCrackTemp" style="color:#1976d2;font-weight:700;">--</div></div>
+                <div class="summary-item"><div class="summary-label">總時間</div><div class="summary-value" id="sumTime" style="color:#1976d2;font-weight:700;">4分30秒</div></div>
+            </div>
+        </div>
+        <!-- 溫度曲線 -->
+        <div class="chart-section">
+            <div class="summary-label" style="font-weight:600;margin-bottom:8px;"><i class="fa fa-line-chart me-1"></i> 烘豆溫度曲線</div>
+            <canvas id="tempChart" height="180"></canvas>
+        </div>
+        <!-- 每30秒詳情表格 -->
+        <div class="table-section">
+            <div class="table-title"><i class="fa fa-clock-o me-1"></i> 每30秒詳細記錄</div>
+            <table class="table table-bordered mb-0">
+                <thead style="background:#e3f2fd;">
+                    <tr><th>時間</th><th>溫度 (°C)</th><th>火力</th></tr>
+                </thead>
+                <tbody id="detailTable"></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></script>
+    <script>
+    // 返回鍵功能（id 綁定，確保唯一且不重複）
+    document.addEventListener('DOMContentLoaded', function() {
+        var backBtn = document.getElementById('backToHistoryBtn');
+        if (backBtn) {
+            backBtn.removeAttribute('onclick');
+            backBtn.onclick = function() {
+                window.location.href = 'history_view.html';
+            };
+        }
+    });
+    // 取得網址參數 idx
+    function getQueryParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+    }
+    const idx = getQueryParam('idx');
+    let history = JSON.parse(localStorage.getItem('roastHistory')||'[]');
+    let item = history[idx] || {};
+    // 摘要區
+        if(item.date){
+            const parts = item.date.split('-');
+            document.getElementById('sumDate').innerHTML = `<span style='display:block;'>${parts[0]}</span><span style='display:block;'>${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}</span>`;
+        }else{
+            document.getElementById('sumDate').textContent = '--';
+        }
+    document.getElementById('sumType').textContent = item.beanType || '--';
+    document.getElementById('sumInput').textContent = item.inputWeight ? item.inputWeight + 'g' : '--';
+    document.getElementById('sumOutput').textContent = item.outputWeight ? item.outputWeight + 'g' : '--';
+    document.getElementById('sumLoss').textContent = item.lossRate ? item.lossRate + '%' : '--';
+    document.getElementById('sumRoast').textContent = item.roastLevel || '--';
+    document.getElementById('sumFirstCrackTime').textContent = item.firstCrackTime || '--';
+    document.getElementById('sumFirstCrackTemp').textContent = item.firstCrackTemp || '--';
+    document.getElementById('sumSecondCrackTime').textContent = item.secondCrackTime || '--';
+    document.getElementById('sumSecondCrackTemp').textContent = item.secondCrackTemp || '--';
+    document.getElementById('sumTime').textContent = item.totalTime || '--';
+
+    // 詳細資料（溫度/火力曲線）
+    let detailData = Array.isArray(item.detailArr) ? item.detailArr : [];
+    // 只取 0:00~8:30 的 mm:ss 格式資料
+    function isValidTime(t) {
+        if (!t || typeof t !== 'string') return false;
+        const match = t.match(/^([0-9]{1,2}):([0-9]{2})$/);
+        if (!match) return false;
+        const min = parseInt(match[1],10);
+        const sec = parseInt(match[2],10);
+        const totalSec = min*60 + sec;
+        return totalSec <= 8*60+30;
+    }
+    let filteredDetail = [];
+    for (const row of detailData) {
+        if (row.time && isValidTime(row.time)) {
+            filteredDetail.push(row);
+            if (row.time === '8:30') break;
+        }
+    }
+    // 曲線資料
+    let tempLabels = [];
+    let tempValues = [];
+    if (filteredDetail.length) {
+        tempLabels = filteredDetail.map(row => row.time || '--');
+        tempValues = filteredDetail.map(row => row.temp || null);
+    } else {
+        tempLabels = ['--'];
+        tempValues = [null];
+    }
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: tempLabels,
+            datasets: [{
+                label: '溫度 (°C)',
+                data: tempValues,
+                borderColor: '#1976d2',
+                backgroundColor: 'rgba(25,118,210,0.08)',
+                fill: false,
+                tension: 0.3,
+                pointRadius: 2,
+                pointBackgroundColor: '#1976d2',
+                pointBorderColor: '#1976d2',
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    type: 'category',
+                    min: tempLabels[0],
+                    max: tempLabels[tempLabels.length-1]
+                },
+                y: { grid: { color: '#e3f2fd' }, beginAtZero: true }
+            }
+        }
+    });
+    // 詳細表格
+    const tbody = document.getElementById('detailTable');
+    if (filteredDetail.length) {
+        tbody.innerHTML = filteredDetail.map(row => `<tr><td>${row.time||'--'}</td><td>${row.temp!==undefined?row.temp+'°C':'--'}</td><td>${row.power!==undefined?row.power:'--'}</td></tr>`).join('');
+    } else {
+        tbody.innerHTML = `<tr><td>--</td><td>--</td><td>--</td></tr>`;
+    }
+    </script>
+</body>
+</html>
